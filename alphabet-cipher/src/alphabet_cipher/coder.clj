@@ -25,14 +25,12 @@
 (defn decipher-char [cipher letter]
   (nth (char-row \a) (.indexOf (char-row letter) cipher)))
 
-(defn pad-keyword [keyword message]
-  (let [reps (int (Math/ceil (/ (count message) (count keyword))))
-        padded (apply str (repeat reps keyword))]
-    (subs padded 0 (count message))))
+(defn pad-keyword [keyword len]
+  (take len (apply concat (repeat keyword))))
 
 (defn process-message [fn keyword message]
-  (let [secret (pad-keyword keyword message)]
-    (apply str (map fn (char-array secret) (char-array message)))))
+  (let [secret (pad-keyword keyword (count message))]
+    (apply str (map fn secret (char-array message)))))
 
 (defn encode [keyword message]
   (process-message encode-char keyword message))
@@ -47,4 +45,3 @@
         (if (= cipher (encode keyword message))
           keyword
           (recur (inc i)))))))
-
